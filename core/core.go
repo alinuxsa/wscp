@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gorilla/websocket"
+	"github.com/k0kubun/go-ansi"
 	"github.com/schollz/progressbar/v3"
 )
 
@@ -47,7 +48,21 @@ func ReadFile(fn string, c *websocket.Conn) {
 	}
 	finfo, _ := f.Stat()
 	total := finfo.Size()
-	bar := progressbar.Default(total)
+	// bar := progressbar.Default(total)
+
+	bar := progressbar.NewOptions(int(total),
+		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
+		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionShowBytes(true),
+		// progressbar.OptionSetWidth(100),
+		progressbar.OptionSetDescription("[cyan][1/1][reset] uploading file..."),
+		progressbar.OptionSetTheme(progressbar.Theme{
+			Saucer:        "[green]=[reset]",
+			SaucerHead:    "[green]>[reset]",
+			SaucerPadding: " ",
+			BarStart:      "[",
+			BarEnd:        "]",
+		}))
 	reader := bufio.NewReader(f)
 	buf := make([]byte, 2048)
 	for {
