@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gorilla/websocket"
+	"github.com/schollz/progressbar/v3"
 )
 
 func CheckFile(fn string) {
@@ -44,6 +45,9 @@ func ReadFile(fn string, c *websocket.Conn) {
 	if err != nil {
 		panic(err)
 	}
+	finfo, _ := f.Stat()
+	total := finfo.Size()
+	bar := progressbar.Default(total)
 	reader := bufio.NewReader(f)
 	buf := make([]byte, 2048)
 	for {
@@ -60,5 +64,6 @@ func ReadFile(fn string, c *websocket.Conn) {
 		if err != nil {
 			panic(err)
 		}
+		bar.Add(n)
 	}
 }
